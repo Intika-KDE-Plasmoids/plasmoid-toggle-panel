@@ -1,0 +1,17 @@
+[Desktop Entry]
+Name=Toggle Panel Button
+Comment=Toggle the visibility of a panel manually with a button click
+
+Type=Service
+Icon=window
+X-KDE-ServiceTypes=Plasma/Applet
+
+X-Plasma-API=declarativeappletscript
+X-Plasma-MainScript=ui/Main.qml
+
+X-KDE-PluginInfo-Author=Intika
+X-KDE-PluginInfo-Email=intika.dev@gmail.com
+X-KDE-PluginInfo-Name=com.github.intika.kdetogglepanel
+X-KDE-PluginInfo-Version=2
+X-KDE-PluginInfo-Website=https://github.com/intika/kdetogglepanel
+X-KDE-PluginInfo-Category=Windows and Tasks
