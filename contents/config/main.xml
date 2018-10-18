@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+      http://www.kde.org/standards/kcfg/1.0/kcfg.xsd" >
+  <kcfgfile name=""/>
+
+  <group name="General">
+    <entry name="clickCommand" type="String">
+      <default>HideAutoUnhide</default>
+    </entry>
+    <entry name="clickCommandID" type="String">
+      <default>PanelID0</default>
+    </entry>
+    <entry name="forceDis" type="String">
+      <default>True</default>
+    </entry>
+    <entry name="icon" type="String">
+      <default>panel-24px</default>
+    </entry>
+    <entry name="advancedUnlock" type="String">
+      <default>False</default>
+    </entry>
+  </group>
+
+</kcfg>
+
