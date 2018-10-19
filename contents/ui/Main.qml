@@ -20,6 +20,11 @@ Item {
     property var script: "setImmutability('mutable');"
     property var unlockHacky1: 'qdbus org.kde.kglobalaccel /component/plasmashell invokeShortcut "show dashboard"; '
     property var unlockHacky2: 'xdotool key alt+d l; qdbus org.kde.kglobalaccel /component/plasmashell invokeShortcut "show dashboard"'
+    property var advancedScript_p1: 'qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript '
+    property var advancedScript_p2: "setImmutability('userImmutable');"
+    property var workingMode: 'if (panel.height > 0) {panel.height = panel.height * -1;}"'
+    property var manualHide: 'False'
+    property var manualShow: 'False'
 
 	Plasmoid.onActivated: widget.activate()
     
@@ -84,8 +89,36 @@ Item {
 		}
 	}
     
-	function action_prepareScript() {
-        plasmascriptline2 = "panel.height = panel.height * -1; ";
+	function action_prepareScript() {        
+    
+        if (plasmoid.configuration.forceSize == 'True') {
+        
+            plasmascriptline2 = "if (panel.height == 0) {panel.height = " + plasmoid.configuration.customSize + "} else {panel.height = 0;} ";
+            workingMode = 'if (panel.height > 0) {panel.height = 0;}"' //Used for auto hide feature
+            
+            if (manualHide == 'True') {
+                plasmascriptline2 = "if (panel.height > 0) {panel.height = 0;} ";
+            }
+            
+            if (manualShow == 'True') {
+                plasmascriptline2 = "if (panel.height == 0) {panel.height = " + plasmoid.configuration.customSize + "} ";
+            }
+            
+        } else {
+        
+            plasmascriptline2 = "panel.height = panel.height * -1; ";
+            workingMode = 'if (panel.height > 0) {panel.height = panel.height * -1;}"' //Used for auto hide feature
+            
+            if (manualHide == 'True') {
+                plasmascriptline2 = "if (panel.height > 0) {panel.height = panel.height * -1;} ";
+            }
+            if (manualShow == 'True') {
+                plasmascriptline2 = "if (panel.height < 0) {panel.height = panel.height * -1;} ";
+            }
+            
+        }
+        
+
         
         if (plasmoid.configuration.forceDis == 'True') {
             plasmascriptline3 = "if (panel.location == 'left') {panel.location = 'right'; sleep(5); panel.location = 'left';} ";
@@ -124,16 +157,21 @@ Item {
         plasmascript = plasmascriptline1 + plasmascriptline2 + plasmascriptline3 + plasmascriptline4 + plasmascriptline5 + plasmascriptline6;
 	}
     
+    function action_lockPanelCode() {
+        executable.exec("qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript 'locked = true;'");
+        executable.exec(advancedScript_p1 + '"' + advancedScript_p2 + '"');
+	}
+    
     Timer {
         id:timerLockPanel
-        interval: 1000
-        onTriggered: executable.exec("qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript 'locked = true;'")
+        interval: 800
+        onTriggered: action_lockPanelCode()
     }
     
     Timer {
         id:timerLockPanelLong
         interval: 12000
-        onTriggered: executable.exec("qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript 'locked = true;'")
+        onTriggered: action_lockPanelCode()
     }
     
     Timer {
@@ -145,43 +183,43 @@ Item {
     Timer {
         id:timerDelayToggleDisalbe0
         interval: 800
-        onTriggered: executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[0]); if (panel.height > 0) {panel.height = panel.height * -1;}"');
+        onTriggered: executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[0]); ' + workingMode);
     }
     
     Timer {
         id:timerDelayToggleDisalbe1
         interval: 800
-        onTriggered: executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[1]); if (panel.height > 0) {panel.height = panel.height * -1;}"');
+        onTriggered: executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[1]); ' + workingMode);
     }
     
     Timer {
         id:timerDelayToggleDisalbe2
         interval: 800
-        onTriggered: executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[2]); if (panel.height > 0) {panel.height = panel.height * -1;}"');
+        onTriggered: executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[2]); ' + workingMode);
     }
     
     Timer {
         id:timerDelayToggleDisalbe3
         interval: 800
-        onTriggered: executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[3]); if (panel.height > 0) {panel.height = panel.height * -1;}"');
+        onTriggered: executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[3]); ' + workingMode);
     }
     
     Timer {
         id:timerDelayToggleDisalbe4
         interval: 800
-        onTriggered: executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[4]); if (panel.height > 0) {panel.height = panel.height * -1;}"');
+        onTriggered: executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[4]); ' + workingMode);
     }
     
     Timer {
         id:timerDelayToggleDisalbe5
         interval: 800
-        onTriggered: executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[5]); if (panel.height > 0) {panel.height = panel.height * -1;}"');
+        onTriggered: executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[5]); ' + workingMode);
     }
     
     Timer {
         id:timerDelayToggleDisalbe6
         interval: 800
-        onTriggered: executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[6]); if (panel.height > 0) {panel.height = panel.height * -1;}"');
+        onTriggered: executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[6]); ' + workingMode);
     }
     
 	function action_unlockPanel() {
@@ -214,107 +252,107 @@ Item {
 	}
     
     function action_PanelTimerCode0() {
-        if (plasmoid.immutability !== PlasmaCore.Types.Mutable) {
+        if ((plasmoid.immutability !== PlasmaCore.Types.Mutable) && (plasmoid.configuration.newVersion == 'False')) {
             //Not-Unlocked
             action_unlockPanel();
             if (plasmoid.configuration.advancedUnlock == 'True') {
                 timerDelayToggleDisalbe0.start();
             } else {
-                executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[0]); if (panel.height > 0) {panel.height = panel.height * -1;}"');
+                executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[0]); ' + workingMode);
             }
             action_lockPanel();
         } else {
-            executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[0]); if (panel.height > 0) {panel.height = panel.height * -1;}"')
+            executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[0]); ' + workingMode)
         }
     }
     
     function action_PanelTimerCode1() {
-        if (plasmoid.immutability !== PlasmaCore.Types.Mutable) {
+        if ((plasmoid.immutability !== PlasmaCore.Types.Mutable) && (plasmoid.configuration.newVersion == 'False')) {
             //not unlocked
             action_unlockPanel();
             if (plasmoid.configuration.advancedUnlock == 'True') {
                 timerDelayToggleDisalbe1.start();
             } else {
-                executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[1]); if (panel.height > 0) {panel.height = panel.height * -1;}"');
+                executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[1]); ' + workingMode);
             }
             action_lockPanel();
         } else {
-            executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[1]); if (panel.height > 0) {panel.height = panel.height * -1;}"')
+            executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[1]); ' + workingMode)
         }
     }
     
     function action_PanelTimerCode2() {
-        if (plasmoid.immutability !== PlasmaCore.Types.Mutable) {
+        if ((plasmoid.immutability !== PlasmaCore.Types.Mutable) && (plasmoid.configuration.newVersion == 'False')) {
             //not unlocked
             action_unlockPanel();
             if (plasmoid.configuration.advancedUnlock == 'True') {
                 timerDelayToggleDisalbe2.start();
             } else {
-                executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[2]); if (panel.height > 0) {panel.height = panel.height * -1;}"');
+                executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[2]); ' + workingMode);
             }
             action_lockPanel();
         } else {
-            executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[2]); if (panel.height > 0) {panel.height = panel.height * -1;}"')
+            executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[2]); ' + workingMode)
         }
     }
     
     function action_PanelTimerCode3() {
-        if (plasmoid.immutability !== PlasmaCore.Types.Mutable) {
+        if ((plasmoid.immutability !== PlasmaCore.Types.Mutable) && (plasmoid.configuration.newVersion == 'False')) {
             //not unlocked
             action_unlockPanel();
             if (plasmoid.configuration.advancedUnlock == 'True') {
                 timerDelayToggleDisalbe3.start();
             } else {
-                executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[3]); if (panel.height > 0) {panel.height = panel.height * -1;}"');
+                executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[3]); ' + workingMode);
             }
             action_lockPanel();
         } else {
-            executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[3]); if (panel.height > 0) {panel.height = panel.height * -1;}"')
+            executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[3]); ' + workingMode)
         }
     }
     
     function action_PanelTimerCode4() {
-        if (plasmoid.immutability !== PlasmaCore.Types.Mutable) {
+        if ((plasmoid.immutability !== PlasmaCore.Types.Mutable) && (plasmoid.configuration.newVersion == 'False')) {
             //not unlocked
             action_unlockPanel();
             if (plasmoid.configuration.advancedUnlock == 'True') {
                 timerDelayToggleDisalbe4.start();
             } else {
-                executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[4]); if (panel.height > 0) {panel.height = panel.height * -1;}"');
+                executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[4]); ' + workingMode);
             }
             action_lockPanel();
         } else {
-            executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[4]); if (panel.height > 0) {panel.height = panel.height * -1;}"')
+            executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[4]); ' + workingMode)
         }
     }
     
     function action_PanelTimerCode5() {
-        if (plasmoid.immutability !== PlasmaCore.Types.Mutable) {
+        if ((plasmoid.immutability !== PlasmaCore.Types.Mutable) && (plasmoid.configuration.newVersion == 'False')) {
             //not unlocked
             action_unlockPanel();
             if (plasmoid.configuration.advancedUnlock == 'True') {
                 timerDelayToggleDisalbe5.start();
             } else {
-                executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[5]); if (panel.height > 0) {panel.height = panel.height * -1;}"');
+                executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[5]); ' + workingMode);
             }
             action_lockPanel();
         } else {
-            executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[5]); if (panel.height > 0) {panel.height = panel.height * -1;}"')
+            executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[5]); ' + workingMode)
         }
     }
     
     function action_PanelTimerCode6() {
-        if (plasmoid.immutability !== PlasmaCore.Types.Mutable) {
+        if ((plasmoid.immutability !== PlasmaCore.Types.Mutable) && (plasmoid.configuration.newVersion == 'False')) {
             //not unlocked
             action_unlockPanel();
             if (plasmoid.configuration.advancedUnlock == 'True') {
                 timerDelayToggleDisalbe6.start();
             } else {
-                executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[6]); if (panel.height > 0) {panel.height = panel.height * -1;}"');
+                executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[6]); ' + workingMode);
             }
             action_lockPanel();
         } else {
-            executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[6]); if (panel.height > 0) {panel.height = panel.height * -1;}"')
+            executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript "panel = panelById(panelIds[6]); ' + workingMode)
         }
     }
 
@@ -364,19 +402,23 @@ Item {
     
         action_prepareScript();
         
-        if (plasmoid.immutability !== PlasmaCore.Types.Mutable) {
-            //not unlocked
-            action_unlockPanel();
-            if (plasmoid.configuration.advancedUnlock == 'True') {
-                timerDelayToggle.start();
+        if (plasmoid.configuration.newVersion == 'True') {
+            executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript ' + '"' + plasmascript + '"');
+        } else {
+            if (plasmoid.immutability !== PlasmaCore.Types.Mutable) {
+                //not unlocked
+                action_unlockPanel();
+                if (plasmoid.configuration.advancedUnlock == 'True') {
+                    timerDelayToggle.start();
+                } else {
+                    executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript ' + '"' + plasmascript + '"');
+                }
+                action_lockPanel();
             } else {
                 executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript ' + '"' + plasmascript + '"');
             }
-            action_lockPanel();
-        } else {
-            executable.exec('qdbus org.kde.plasmashell /PlasmaShell evaluateScript ' + '"' + plasmascript + '"');
         }
-     
+        
 	}
     
 	function activate() {        
@@ -393,9 +435,23 @@ Item {
             action_HideUnhide()
 		}
 	}    
+    
+	function action_hideDesktopPanel() {
+        manualHide = 'True';
+        action_HideUnhide();
+        manualHide = 'False';
+	}  
+    
+	function action_showDesktopPanel() {
+        manualShow = 'True';
+        action_HideUnhide();
+        manualShow = 'False';
+	}  
 
 	Component.onCompleted: {
 		plasmoid.setAction("showDesktopGrid", i18n("Show Desktop Grid"), "view-grid");
+        plasmoid.setAction("hideDesktopPanel", i18n("Hide Panel"), "bboxnext");
+        plasmoid.setAction("showDesktopPanel", i18n("Show Panel"), "bboxprev");
 		//plasmoid.action('configure').trigger() // Uncomment to open the config window on load.
 	}
 }

@@ -10,9 +10,18 @@
       <default>HideAutoUnhide</default>
     </entry>
     <entry name="clickCommandID" type="String">
-      <default>PanelID0</default>
+      <default>PanelID2</default>
     </entry>
     <entry name="forceDis" type="String">
+      <default>True</default>
+    </entry>
+    <entry name="forceSize" type="String">
+      <default>False</default>
+    </entry>
+    <entry name="customSize" type="String">
+      <default>26</default>
+    </entry>      
+    <entry name="newVersion" type="String">
       <default>True</default>
     </entry>
     <entry name="icon" type="String">

@@ -13,11 +13,16 @@ ConfigPage {
 	property string cfg_clickCommandID
 	property string cfg_forceDis
 	property string cfg_advancedUnlock
+	property string cfg_newVersion
+	property string cfg_forceSize
+    property alias cfg_customSize: customSize.text
 
 	ExclusiveGroup { id: clickCommandGroup }
 	ExclusiveGroup { id: clickCommandGroupID }
 	ExclusiveGroup { id: forceDisGroup }
 	ExclusiveGroup { id: advancedUnlockGroup }
+	ExclusiveGroup { id: newVersionGroup }
+	ExclusiveGroup { id: forceSizeGroup }
     
 	ConfigSection {
 		label: i18n("Click Action")
@@ -85,7 +90,21 @@ ConfigPage {
 	}
     
 	ConfigSection {
-		label: i18n("Working Mode")
+		label: i18n("Button Icon")
+
+		ConfigIcon {
+			configKey: 'icon'
+			defaultValue: 'panel-24px'
+			presetValues: [
+				'panel-24px',
+				'panel-22px',
+				'panel-16px',
+			]
+		}
+	}
+    
+	ConfigSection {
+		label: i18n("Working Mode - Effect")
 
 		RadioButton {
 			text: i18nd("kwin_effects", "Force the panel to popup (useful when the panel is set to autohide) \nThe panel blink on the opposite side")
@@ -101,31 +120,66 @@ ConfigPage {
 		}
 	}
     
+    
+    
 	ConfigSection {
-		label: i18n("Button Icon")
+		label: i18n("Working Mode - Toggle")
 
-		ConfigIcon {
-			configKey: 'icon'
-			defaultValue: 'panel-24px'
-			presetValues: [
-				'panel-24px',
-				'panel-22px',
-				'panel-16px',
-			]
+		RadioButton {
+			text: i18nd("kwin_effects", "Use a negative value to toggle the panel \nThe panel size is multiplied by '-1' to toggle")
+			checked: cfg_forceSize == 'False'
+			exclusiveGroup: forceSizeGroup
+			onClicked: cfg_forceSize = 'False'
+		}        
+		RadioButton {
+			text: i18nd("kwin_effects", "Set the panel size to '0' when hiding and \nforce its size to specified value when unhiding\nThe panel size need to be specified")
+			checked: cfg_forceSize == 'True'
+			exclusiveGroup: forceSizeGroup
+			onClicked: cfg_forceSize = 'True'
+		}
+        
+        Label {
+            text: "Panel custom size (Depend on settings above)"
+        }
+        TextField {
+            id: customSize
+            placeholderText: qsTr("26px")
+            text: i18n(cfg_customSize)
+            validator: IntValidator {
+                bottom: 1
+                top: 9999
+            }
+        }
+	}
+    
+	ConfigSection {
+		label: i18n("Plasma Version")
+
+		RadioButton {
+			text: i18nd("kwin_effects", "KDE Plasma v5.13 and above \nAdvanced settings are ignored \nThe panel does not need to be unlocked")
+			checked: cfg_newVersion == 'True'
+			exclusiveGroup: newVersionGroup
+			onClicked: cfg_newVersion = 'True'
+		}
+		RadioButton {
+			text: i18nd("kwin_effects", "KDE Plasma v5.12 and below \nAdvanced settings are used \nThe panel need to be unlocked")
+			checked: cfg_newVersion == 'False'
+			exclusiveGroup: newVersionGroup
+			onClicked: cfg_newVersion = 'False'
 		}
 	}
     
 	ConfigSection {
-		label: i18n("Advanced Settings")
+		label: i18n("Advanced Settings - Unlocking - Affect Plasma Up To v5.12")
 
 		RadioButton {
-			text: i18nd("kwin_effects", "Force unlocking the panel \nThe panel may not be relocked \n(The panel need to be unlocked for this widget to work)")
+			text: i18nd("kwin_effects", "Force unlocking the panel \nThe panel may not be relocked (this needs xdotool package)\n(The panel need to be unlocked for this widget to work in plasma < v5.13)")
 			checked: cfg_advancedUnlock == 'True'
 			exclusiveGroup: advancedUnlockGroup
 			onClicked: cfg_advancedUnlock = 'True'
 		}
 		RadioButton {
-			text: i18nd("kwin_effects", "Use classic method to unlock/lock the panel (Needs plasma > v5.12) \n(The panel need to be unlocked for this widget to work)")
+			text: i18nd("kwin_effects", "Try classic method to unlock/lock the panel \n(The panel need to be unlocked for this widget to work in plasma < v5.13)")
 			checked: cfg_advancedUnlock == 'False'
 			exclusiveGroup: advancedUnlockGroup
 			onClicked: cfg_advancedUnlock = 'False'

@@ -12,6 +12,6 @@ X-Plasma-MainScript=ui/Main.qml
 X-KDE-PluginInfo-Author=Intika
 X-KDE-PluginInfo-Email=intika.dev@gmail.com
 X-KDE-PluginInfo-Name=com.github.intika.kdetogglepanel
-X-KDE-PluginInfo-Version=2
+X-KDE-PluginInfo-Version=3
 X-KDE-PluginInfo-Website=https://github.com/intika/kdetogglepanel
 X-KDE-PluginInfo-Category=Windows and Tasks
