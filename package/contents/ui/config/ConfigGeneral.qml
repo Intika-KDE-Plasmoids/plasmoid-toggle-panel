@@ -120,13 +120,11 @@ ConfigPage {
 		}
 	}
     
-    
-    
 	ConfigSection {
 		label: i18n("Working Mode - Toggle")
 
 		RadioButton {
-			text: i18nd("kwin_effects", "Use a negative value to toggle the panel \nThe panel size is multiplied by '-1' to toggle")
+			text: i18nd("kwin_effects", "Use a negative value to toggle the panel \nThe panel size is multiplied by '-1' to toggle \nThe panel need to be visible before setting this")
 			checked: cfg_forceSize == 'False'
 			exclusiveGroup: forceSizeGroup
 			onClicked: cfg_forceSize = 'False'

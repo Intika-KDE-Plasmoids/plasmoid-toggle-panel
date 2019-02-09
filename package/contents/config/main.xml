@@ -30,6 +30,10 @@
     <entry name="advancedUnlock" type="String">
       <default>False</default>
     </entry>
+    <entry name="checkUpdateStartup" type="Bool">
+      <label>Notify for update on startup</label>
+      <default>true</default>
+    </entry>
   </group>
 
 </kcfg>

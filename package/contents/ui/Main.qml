@@ -8,6 +8,12 @@ import "lib"
 Item {
 	id: widget
 
+    // Updater 1/3 ==================================================================================================================================
+    property string updateResponse;
+    property string currentVersion: '6.0';
+    property bool checkUpdateStartup: Plasmoid.configuration.checkUpdateStartup
+    // ==============================================================================================================================================
+
 	property bool disableLatteParabolicIcon: true // Don't hide the representation in Latte (https://github.com/psifidotos/Latte-Dock/issues/983)
     
     property var plasmascript: ''
@@ -93,15 +99,15 @@ Item {
     
         if (plasmoid.configuration.forceSize == 'True') {
         
-            plasmascriptline2 = "if (panel.height == 0) {panel.height = " + plasmoid.configuration.customSize + "} else {panel.height = 0;} ";
-            workingMode = 'if (panel.height > 0) {panel.height = 0;}"' //Used for auto hide feature
+            plasmascriptline2 = "if (panel.height == -1) {panel.height = " + plasmoid.configuration.customSize + "} else {panel.height = -1;} ";
+            workingMode = 'if (panel.height > 0) {panel.height = -1;}"' //Used for auto hide feature
             
             if (manualHide == 'True') {
-                plasmascriptline2 = "if (panel.height > 0) {panel.height = 0;} ";
+                plasmascriptline2 = "if (panel.height > 0) {panel.height = -1;} ";
             }
             
             if (manualShow == 'True') {
-                plasmascriptline2 = "if (panel.height == 0) {panel.height = " + plasmoid.configuration.customSize + "} ";
+                plasmascriptline2 = "if (panel.height == -1) {panel.height = " + plasmoid.configuration.customSize + "} ";
             }
             
         } else {
@@ -446,12 +452,69 @@ Item {
         manualShow = 'True';
         action_HideUnhide();
         manualShow = 'False';
-	}  
+	}
+    
+    PlasmaCore.DataSource {
+        id: executableNotification
+        engine: "executable"
+        onNewData: disconnectSource(sourceName) // cmd finished
+        function exec(cmd) {
+            connectSource(cmd)
+        }
+    }
+    
+    // Updater 2/3 ==================================================================================================================================
+    Timer {
+        id:timerStartUpdater
+        interval: 300000
+        onTriggered: updaterNotification(false)
+    }
+    
+    function availableUpdate() {
+        var notificationCommand = "notify-send --icon=remmina-panel 'Plasmoid KDE Toggle Panel' 'An update is available \n<a href=\"https://www.opendesktop.org/p/1269113/\">Update link</a>' -t 30000";
+        executableNotification.exec(notificationCommand);
+    }
+
+    function noAvailableUpdate() {
+        var notificationCommand = "notify-send --icon=remmina-panel 'Plasmoid KDE Toggle Panel' 'Your current version is up to date' -t 30000";
+        executableNotification.exec(notificationCommand);
+    }
+    
+    function updaterNotification(notifyUpdated) {
+        var xhr = new XMLHttpRequest;
+        xhr.responseType = 'text';
+        xhr.open("GET", "https://raw.githubusercontent.com/Intika-Linux-Plasmoid/plasmoid-toggle-panel/master/version");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                updateResponse = xhr.responseText;
+                console.log('.'+updateResponse+'.');
+                console.log('.'+currentVersion+'.');
+                //console.log('.'+xhr.status+'.');
+                //console.log('.'+xhr.statusText+'.');
+                if (updateResponse.localeCompare(currentVersion) && updateResponse.localeCompare('') && updateResponse.localeCompare('404: Not Found\n')) {
+                    availableUpdate();
+                } else if (notifyUpdated) {
+                    noAvailableUpdate();
+                }
+            }
+        };
+        xhr.send();
+    }
+    
+    function action_checkUpdate() {
+        updaterNotification(true);
+    }
+    // ==============================================================================================================================================
 
 	Component.onCompleted: {
 		plasmoid.setAction("showDesktopGrid", i18n("Show Desktop Grid"), "view-grid");
         plasmoid.setAction("hideDesktopPanel", i18n("Hide Panel"), "bboxnext");
         plasmoid.setAction("showDesktopPanel", i18n("Show Panel"), "bboxprev");
 		//plasmoid.action('configure').trigger() // Uncomment to open the config window on load.
+        
+        // Updater 3/3 ==============================================================================================================================
+        plasmoid.setAction("checkUpdate", i18n("Check for updates on github"), "view-grid");
+        if (checkUpdateStartup) {timerStartUpdater.start();}
+        // ==========================================================================================================================================
 	}
 }
